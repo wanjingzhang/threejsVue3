@@ -9,9 +9,12 @@ import {
   GridHelper,
   BoxGeometry,
   MeshBasicMaterial,
-  Mesh,
+  Mesh,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,
+  EquirectangularReflectionMapping
 } from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";  
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
     onMounted(() => {
       console.log('mounted!') 
@@ -21,6 +24,34 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
       if (dom) {
         //场景
         const scene = new Scene()
+        const options = {
+            enableSwoopingCamera: false,
+            enableRotation: false,
+            color: 0xffffff,
+            metalness: 0,
+            roughness: 0.2,
+            transmission: 1,
+            ior: 1.5,
+            reflectivity: 0.5,
+            thickness: 2.5,
+            envMapIntensity: 1.5,
+            clearcoat: 1,
+            clearcoatRoughness: 0.1,
+            normalScale: 0.3,
+            clearcoatNormalScale: 0.2,
+            normalRepeat: 3,
+            // attenuationTint: 0xffffff,
+            // attenuationDistance: 0,
+            bloomThreshold: 0.85,
+            bloomStrength: 0.35,
+            bloomRadius: 0.33,
+          };
+        const hdrEquirect = new RGBELoader().load(
+          "../src/assets/empty_warehouse_01_2k.hdr",
+          () => {
+            hdrEquirect.mapping = EquirectangularReflectionMapping;
+          }
+        );
         //相机
         const camera = new PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
         camera.position.z = 1;
@@ -44,14 +75,64 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
         //接下来 创建几何体
         //添加几何体
         //创建立方体
-        const geometry = new BoxGeometry(0.5, 0.5, 0.5)
-        //创建材质
-        const material = new MeshBasicMaterial()
-        //创建mesh
-        const mesh = new Mesh(geometry, material)
-        mesh.position.set(0, 1, 0)
-        //将mesh添加到场景中
-        scene.add(mesh)
+        const textureLoader = new TextureLoader();
+        const bgTexture = textureLoader.load("../src/assets/texture.jpg");
+        const bgGeometry = new PlaneGeometry(5, 5);
+        const bgMaterial = new MeshBasicMaterial({ map: bgTexture });
+        const bgMesh = new Mesh(bgGeometry, bgMaterial);
+        bgMesh.position.set(0, 0, -1);
+        scene.add(bgMesh);
+
+        const normalMapTexture = textureLoader.load("../src/assets/texture.jpg");
+        normalMapTexture.wrapS = RepeatWrapping;
+        normalMapTexture.wrapT = RepeatWrapping;
+        normalMapTexture.repeat.set(options.normalRepeat, options.normalRepeat);
+
+        const material = new MeshPhysicalMaterial({
+          color: 0xffffff,
+          metalness: options.metalness,
+          roughness: options.roughness,
+          transmission: options.transmission,
+          ior: options.ior,
+          reflectivity: options.reflectivity,
+          thickness: options.thickness,
+          envMap: hdrEquirect,
+          envMapIntensity: options.envMapIntensity,
+          clearcoat: options.clearcoat,
+          clearcoatRoughness: options.clearcoatRoughness,
+          normalScale: new Vector2(options.normalScale),
+          normalMap: normalMapTexture,
+          clearcoatNormalMap: normalMapTexture,
+          clearcoatNormalScale: new Vector2(options.clearcoatNormalScale),
+          // attenuationTint: options.attenuationTint,
+          // attenuationDistance: options.attenuationDistance,
+        });
+
+        let mesh = null;
+
+        // Load dragon GLTF model
+        new GLTFLoader().load("../src/assets/dragon.glb", (gltf) => {
+          const dragon = gltf.scene.children.find((mesh) => mesh.name === "Dragon");
+
+          // Just copy the geometry from the loaded model
+          const geometry = dragon.geometry.clone();
+
+          // Adjust geometry to suit our scene
+          geometry.rotateX(Math.PI / 2);
+          geometry.translate(0, -4, 0);
+
+          // Create a new mesh and place it in the scene
+          mesh = new Mesh(geometry, material);
+          mesh.scale.set(0.25, 0.25, 0.25);
+          scene.add(mesh);
+
+          // Discard the loaded model
+          gltf.scene.children.forEach((child) => {
+            child.geometry.dispose();
+            child.material.dispose();
+          });
+        });
+ 
         //创建渲染函数
         const render = () => {
           //内置 定时器
