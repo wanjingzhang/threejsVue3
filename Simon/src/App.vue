@@ -18,12 +18,23 @@ const addCube = ()=>{
   const geometry:BoxGeometry = new BoxGeometry( 1, 1, 1 );
   const material:MeshBasicMaterial = new MeshBasicMaterial( { color: '#ff0000' } );
   cube = new Mesh( geometry, material );
+  
+  // Position
   // 方法1：分开设置
   // cube.position.x = 0.7
   // cube.position.y = -0.6
   // cube.position.z = 5
   // 方法2：合并设置
-  cube.position.set(0.7,-0.6,1) 
+  // cube.position.set(0.7,-0.6,1) 
+
+  // Scale
+  // cube.scale.x = 2;
+  cube.scale.set(2,0.5,0.5)
+
+  // Rotation: rotation & quaternion
+  cube.rotation.y = Math.PI * 0.5; // 旋转半圈 == Math.PI / 2
+  // cube.rotation.set(0,0,0) 
+
 
   scene.add( cube ); 
 }
@@ -60,8 +71,8 @@ onMounted(()=>{
     const render = () => {
       //内置 定时器
       requestAnimationFrame(render)
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
+      // cube.rotation.x += 0.01;
+      // cube.rotation.y += 0.01;
 
       //将场景和相机添加到渲染器中执行 一般60次/s
       renderer.render(scene, camera)

@@ -18,3 +18,5 @@
 * distanceTo
 
 ##### AxesHelper 轴帮助
+
+##### scale继承自Vector3
