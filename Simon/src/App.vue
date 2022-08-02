@@ -6,7 +6,7 @@
  
 <script setup lang='ts'>
 import { onMounted } from 'vue'
-import {Scene,PerspectiveCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
+import {Clock,Scene,PerspectiveCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
 
 // 全局对象
 const scene:Scene = new Scene();
@@ -19,7 +19,7 @@ const cubes:Array<Mesh> = new Array<Mesh>(3);
 const addGroup = ()=>{
   group = new Group()
   for(let i=0;i<cubes.length;i++){
-    debugger
+    
     cubes[i] = new Mesh(
       new BoxGeometry(1,1,1),
       new MeshBasicMaterial({color:0xff0000})
@@ -28,7 +28,7 @@ const addGroup = ()=>{
     group.add(cubes[i])
   }
 
-  group.position.set(0,3,0)
+  group.position.set(0,1,0)
  
   scene.add(group)
 }
@@ -85,16 +85,29 @@ onMounted(()=>{
     // cube.position.normalize() // 使之变成1
     // console.log(camera.position.length())
     // camera.lookAt(cube.position)
-    let x = 1;
+
+    // 匀速1 
+    let x = 1, time:number = Date.now(),currentTime:number,deltaTime:number,elapsedTime:number;
+    // 匀速2 也可以用系统的时间
+    const clock = new Clock() 
 
     //创建渲染函数
     const tick = () => {
+      // 获取时间差值
+      // currentTime = Date.now();
+      // deltaTime = currentTime - time;
+      // time = currentTime 
+      elapsedTime = clock.getElapsedTime()
+
       //内置 定时器
       requestAnimationFrame(tick)
-      // cube.rotation.x += 0.01;
+      // group.rotation.x += 0.01 * deltaTime; // 可以让物体匀速运动
+      camera.position.y = Math.sin(elapsedTime) // elapsedTime * Math.PI * 2 // elapsedTime 
+      camera.position.x = Math.cos(elapsedTime)
+      camera.lookAt(group.position)
       // cube.rotation.y += 0.01;
       // group.rotation.x += Math.sin(x++)
-      group.rotation.x += 0.01;
+      // group.rotation.x += 0.01;
 
       //将场景和相机添加到渲染器中执行 一般60次/s
       renderer.render(scene, camera)
