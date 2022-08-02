@@ -9,7 +9,7 @@ import { onMounted } from 'vue'
 import {Clock,Scene,PerspectiveCamera,OrthographicCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
 import gsap from 'gsap' 
 
-// 全局对象
+// 全局对象 
 interface type{width:number,height:number}
 const sizes:type = {width:800,height:600};
 
@@ -24,6 +24,17 @@ const camera:PerspectiveCamera = new PerspectiveCamera( 75, sizes.width/sizes.he
 let renderer:WebGLRenderer,cube:Mesh,group:Group;
 const axesHelper:AxesHelper = new AxesHelper(3); 
 const cubes:Array<Mesh> = new Array<Mesh>(3);
+
+/**
+ * Cursor
+ */
+interface cursorTp{x:number,y:number}
+const cursor:cursorTp = {x:0,y:0}
+document.addEventListener('mousemove',(e)=>{
+  cursor.x = e.clientX / sizes.width - 0.5
+  cursor.y = -(e.clientY / sizes.height - 0.5) 
+})
+
 
 // 添加一个对象小组
 const addGroup = ()=>{
@@ -121,7 +132,8 @@ onMounted(()=>{
       // cube.rotation.y += 0.01;
       // group.rotation.x += Math.sin(x++)
       // group.rotation.x += 0.01;
-
+      camera.position.x = cursor.x * 3
+      camera.position.y = cursor.y * 3
 
       //将场景和相机添加到渲染器中执行 一般60次/s
       renderer.render(scene, camera)
