@@ -30,3 +30,14 @@ Clock 绝对不要使用 getDelta 它绝对会有问题
 #### GreenSock库 GreenSock Animation Platform 
 npm install gsap@3.5.1 -S
 别的版本也许会报错，
+
+##### Control
+DeviceOrientationControl 手机上使用的控制器，但是ios不支持
+FlyControl 飞行控制器
+FirstPersonControl 第一人称控制器 类似fly，不同的是可以向上或向下看
+PointerLockControl 跟随鼠标，鼠标不见了
+OrbitControl 轨道控制器一直会看向某物体 Cool
+TrackballControl 可以旋转视角，悬浮在空中的物体会很立体
+
+
+

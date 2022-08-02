@@ -7,7 +7,8 @@
 <script setup lang='ts'>
 import { onMounted } from 'vue'
 import {Vector3,Clock,Scene,PerspectiveCamera,OrthographicCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
-import gsap from 'gsap' 
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js' 
+import gsap from 'gsap'  
 
 // 全局对象 
 interface type{width:number,height:number}
@@ -21,9 +22,10 @@ const camera:PerspectiveCamera = new PerspectiveCamera( 75, sizes.width/sizes.he
 // const camera:OrthographicCamera = new OrthographicCamera(-1*aspectRatio,1*aspectRatio,1,-1,0.1,100 );
 
 
-let renderer:WebGLRenderer,cube:Mesh,group:Group;
+let renderer:WebGLRenderer,cube:Mesh,group:Group,dom: HTMLCanvasElement,controls:OrbitControls;
 const axesHelper:AxesHelper = new AxesHelper(3); 
 const cubes:Array<Mesh> = new Array<Mesh>(3);
+
 
 /**
  * Cursor
@@ -34,6 +36,16 @@ document.addEventListener('mousemove',(e)=>{
   cursor.x = e.clientX / sizes.width - 0.5
   cursor.y = -(e.clientY / sizes.height - 0.5) 
 })
+
+// 添加一个camera的控制
+const addControls = ()=>{  
+  controls = new OrbitControls(camera,dom)
+  // 1. 更新视角位置，vector3
+  // controls.target.y = 1  
+  // 2. 重量，阻尼
+  controls.enableDamping = true
+
+}
 
 
 // 添加一个对象小组
@@ -88,7 +100,7 @@ const addAxesHelper = () =>{
 }
 
 onMounted(()=>{ 
-  const dom: HTMLCanvasElement = document.querySelector('#three') as HTMLCanvasElement  
+  dom = document.querySelector('#three') as HTMLCanvasElement  
   if (dom) {
     //场景  
     renderer = new WebGLRenderer({
@@ -100,12 +112,14 @@ onMounted(()=>{
 
     addCube()
     // addGroup()
-    addAxesHelper(); 
+    // addAxesHelper();
+
+    addControls(); 
     camera.position.set(0,0,3)
     // console.log(cube.position.distanceTo(camera.position)) // 计算对象和摄像头的距离
     // cube.position.normalize() // 使之变成1
     // console.log(camera.position.length())
-    camera.lookAt(cube.position)
+    // camera.lookAt(cube.position)
 
     // 1. 匀速
     // let x = 1, time:number = Date.now(),currentTime:number,deltaTime:number,elapsedTime:number;
@@ -132,11 +146,17 @@ onMounted(()=>{
       // cube.rotation.y += 0.01;
       // group.rotation.x += Math.sin(x++)
       // group.rotation.x += 0.01;
-      camera.position.x = Math.sin(cursor.x * Math.PI*2) * 3
-      camera.position.z = Math.cos(cursor.x * Math.PI*2) * 3
-      camera.position.y = cursor.y * 5 // 上下
+
+      // 1. 自定义摄像机
+      // camera.position.x = Math.sin(cursor.x * Math.PI*2) * 3
+      // camera.position.z = Math.cos(cursor.x * Math.PI*2) * 3
+      // camera.position.y = cursor.y * 5 // 上下
       // camera.lookAt(new Vector3()) = 
-      camera.lookAt(cube.position) 
+      // camera.lookAt(cube.position) 
+
+      // 2. Oribit Control
+      controls?.update()
+
 
       //将场景和相机添加到渲染器中执行 一般60次/s
       renderer.render(scene, camera)
