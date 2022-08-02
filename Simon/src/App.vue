@@ -1,13 +1,12 @@
 <!--  -->
 <template>
    <div>
-       <!-- <threed/> -->
-       <customDirective/>
+       <threejs/> 
    </div>
 </template>
 
 <script setup lang='ts'>
-import * as threed from './components/threed.vue'
+import threejs from './components/threejs.vue'
 import customDirective from './components/customDirective.vue'
 </script>
 
