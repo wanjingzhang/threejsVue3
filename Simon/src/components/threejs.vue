@@ -6,7 +6,7 @@
  
 <script setup lang='ts'>
 import { onMounted } from 'vue'
-import {Clock,Scene,PerspectiveCamera,OrthographicCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
+import {Vector3,Clock,Scene,PerspectiveCamera,OrthographicCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
 import gsap from 'gsap' 
 
 // 全局对象 
@@ -132,8 +132,10 @@ onMounted(()=>{
       // cube.rotation.y += 0.01;
       // group.rotation.x += Math.sin(x++)
       // group.rotation.x += 0.01;
-      camera.position.x = cursor.x * 3
-      camera.position.y = cursor.y * 3
+      camera.position.x = cursor.x * 10
+      camera.position.y = cursor.y * 10
+      // camera.lookAt(new Vector3()) = 
+      camera.lookAt(cube.position) 
 
       //将场景和相机添加到渲染器中执行 一般60次/s
       renderer.render(scene, camera)
