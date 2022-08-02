@@ -25,3 +25,8 @@
 #### Group
 
 ##### requesAnimationFrame 时间调度
+Clock 绝对不要使用 getDelta 它绝对会有问题
+
+#### GreenSock库 GreenSock Animation Platform 
+npm install gsap@3.5.1 -S
+别的版本也许会报错，

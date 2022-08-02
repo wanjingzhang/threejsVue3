@@ -7,6 +7,7 @@
 <script setup lang='ts'>
 import { onMounted } from 'vue'
 import {Clock,Scene,PerspectiveCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
+import gsap from 'gsap' 
 
 // 全局对象
 const scene:Scene = new Scene();
@@ -45,16 +46,16 @@ const addCube = ()=>{
   // cube.position.y = -0.6
   // cube.position.z = 5
   // 方法2：合并设置
-  cube.position.set(4.7,-0.6,1) 
+  // cube.position.set(4.7,-0.6,1) 
 
   // 2. Scale
   // cube.scale.x = 2;
-  cube.scale.set(2,0.5,0.5)
+  // cube.scale.set(2,0.5,0.5)
 
   // 3. Rotation: rotation & quaternion。***gimbal lock 注意***
   // cube.rotation.reorder('YXZ')
-  cube.rotation.x = Math.PI * 0.25;
-  cube.rotation.y = Math.PI * 0.25; // 旋转半圈 == Math.PI / 2
+  // cube.rotation.x = Math.PI * 0.25;
+  // cube.rotation.y = Math.PI * 0.25; // 旋转半圈 == Math.PI / 2
   // cube.rotation.set(0,0,0)   
   scene.add( cube ); 
 }
@@ -77,8 +78,8 @@ onMounted(()=>{
     }); 
     renderer.setSize( window.innerWidth, window.innerHeight ); 
 
-    // addCube()
-    addGroup()
+    addCube()
+    // addGroup()
     addAxesHelper(); 
     camera.position.set(1,0.2,6)
     // console.log(cube.position.distanceTo(camera.position)) // 计算对象和摄像头的距离
@@ -86,28 +87,32 @@ onMounted(()=>{
     // console.log(camera.position.length())
     // camera.lookAt(cube.position)
 
-    // 匀速1 
-    let x = 1, time:number = Date.now(),currentTime:number,deltaTime:number,elapsedTime:number;
-    // 匀速2 也可以用系统的时间
-    const clock = new Clock() 
+    // 1. 匀速
+    // let x = 1, time:number = Date.now(),currentTime:number,deltaTime:number,elapsedTime:number;
+    // 2. 匀速也可以用系统的时间
+    // const clock = new Clock() 
+    // 3. gasp
+    gsap.to(cube.position,{duration:1,delay:1,x:2})
+    gsap.to(cube.position,{duration:1,delay:2,x:0})
 
     //创建渲染函数
     const tick = () => {
-      // 获取时间差值
+      // 1. 获取时间差值
       // currentTime = Date.now();
       // deltaTime = currentTime - time;
-      // time = currentTime 
-      elapsedTime = clock.getElapsedTime()
-
-      //内置 定时器
-      requestAnimationFrame(tick)
+      // time = currentTime  
+      
+      requestAnimationFrame(tick) 
+      //2. 内置 定时器
+      // elapsedTime = clock.getElapsedTime()
       // group.rotation.x += 0.01 * deltaTime; // 可以让物体匀速运动
-      camera.position.y = Math.sin(elapsedTime) // elapsedTime * Math.PI * 2 // elapsedTime 
-      camera.position.x = Math.cos(elapsedTime)
-      camera.lookAt(group.position)
+      // camera.position.y = Math.sin(elapsedTime) // elapsedTime * Math.PI * 2 // elapsedTime 
+      // camera.position.x = Math.cos(elapsedTime)
+      // camera.lookAt(group.position)
       // cube.rotation.y += 0.01;
       // group.rotation.x += Math.sin(x++)
       // group.rotation.x += 0.01;
+
 
       //将场景和相机添加到渲染器中执行 一般60次/s
       renderer.render(scene, camera)
