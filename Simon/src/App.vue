@@ -1,17 +1,33 @@
 <template>
   <div >
-    <canvas id="three" width="1200" height="900"></canvas>
+    <canvas id="three" width="800" height="600"></canvas>
   </div>
 </template>
  
 <script setup lang='ts'>
 import { onMounted } from 'vue'
-import {Clock,Scene,PerspectiveCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
+import {Clock,Scene,PerspectiveCamera,OrthographicCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
 import gsap from 'gsap' 
 
 // 全局对象
+interface type{width:number,height:number}
+const sizes:type = {width:800,height:600};
+
+const aspectRatio = sizes.width / sizes.height;
 const scene:Scene = new Scene();
-const camera:PerspectiveCamera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+// 1. PerspectiveCamera(视野，屏幕比例，近，远位置) 透视相机
+// const camera:PerspectiveCamera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+// 2. OrthographicCamera(left,right,top,bottom,近，远)正交相机
+const camera:OrthographicCamera = new OrthographicCamera(
+  -1*aspectRatio,
+  1*aspectRatio,
+  1,
+  -1,
+  0.1,
+  100 
+  );
+
+
 let renderer:WebGLRenderer,cube:Mesh,group:Group;
 const axesHelper:AxesHelper = new AxesHelper(3); 
 const cubes:Array<Mesh> = new Array<Mesh>(3);
@@ -36,7 +52,7 @@ const addGroup = ()=>{
 
 // 添加一个正方形对象
 const addCube = ()=>{
-  const geometry:BoxGeometry = new BoxGeometry( 1, 1, 1 );
+  const geometry:BoxGeometry = new BoxGeometry( 1, 1, 1,5,5,5 );
   const material:MeshBasicMaterial = new MeshBasicMaterial( { color: '#ff0000' } );
   cube = new Mesh( geometry, material );
   
@@ -76,24 +92,24 @@ onMounted(()=>{
       alpha: true, //是否背景可以透明
       antialias: true, //抗拒齿
     }); 
-    renderer.setSize( window.innerWidth, window.innerHeight ); 
+    renderer.setSize( sizes.width, sizes.height ); 
 
     addCube()
     // addGroup()
     addAxesHelper(); 
-    camera.position.set(1,0.2,6)
+    camera.position.set(2,2,2)
     // console.log(cube.position.distanceTo(camera.position)) // 计算对象和摄像头的距离
     // cube.position.normalize() // 使之变成1
     // console.log(camera.position.length())
-    // camera.lookAt(cube.position)
+    camera.lookAt(cube.position)
 
     // 1. 匀速
     // let x = 1, time:number = Date.now(),currentTime:number,deltaTime:number,elapsedTime:number;
     // 2. 匀速也可以用系统的时间
     // const clock = new Clock() 
     // 3. gasp
-    gsap.to(cube.position,{duration:1,delay:1,x:2})
-    gsap.to(cube.position,{duration:1,delay:2,x:0})
+    // gsap.to(cube.position,{duration:1,delay:1,x:2})
+    // gsap.to(cube.position,{duration:1,delay:2,x:0})
 
     //创建渲染函数
     const tick = () => {
@@ -109,7 +125,7 @@ onMounted(()=>{
       // camera.position.y = Math.sin(elapsedTime) // elapsedTime * Math.PI * 2 // elapsedTime 
       // camera.position.x = Math.cos(elapsedTime)
       // camera.lookAt(group.position)
-      // cube.rotation.y += 0.01;
+      cube.rotation.y += 0.01;
       // group.rotation.x += Math.sin(x++)
       // group.rotation.x += 0.01;
 
