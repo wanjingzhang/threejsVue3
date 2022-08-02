@@ -14,9 +14,12 @@
 
 ##### position继承自Vector3，它有很多内置的方法
 
-* length
-* distanceTo
+* length 长度
+* distanceTo 两个物体直接的距离
+* lookAt 摄像头看向的方向
+
+##### scale继承自Vector3
 
 ##### AxesHelper 轴帮助
 
-##### scale继承自Vector3
+#### Group

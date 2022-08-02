@@ -6,36 +6,56 @@
  
 <script setup lang='ts'>
 import { onMounted } from 'vue'
-import {Scene,PerspectiveCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
+import {Scene,PerspectiveCamera,WebGLRenderer,AxesHelper,GridHelper,BoxGeometry,MeshBasicMaterial,Mesh,Group,PlaneGeometry,TextureLoader,MeshPhysicalMaterial,RepeatWrapping,Vector2,EquirectangularReflectionMapping} from 'three'
 
 // 全局对象
 const scene:Scene = new Scene();
 const camera:PerspectiveCamera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-let renderer:WebGLRenderer,cube:Mesh;
+let renderer:WebGLRenderer,cube:Mesh,group:Group;
 const axesHelper:AxesHelper = new AxesHelper(3); 
+const cubes:Array<Mesh> = new Array<Mesh>(3);
 
+// 添加一个对象小组
+const addGroup = ()=>{
+  group = new Group()
+  for(let i=0;i<cubes.length;i++){
+    debugger
+    cubes[i] = new Mesh(
+      new BoxGeometry(1,1,1),
+      new MeshBasicMaterial({color:0xff0000})
+    )
+    cubes[i].position.set(i*1.2,1,1)
+    group.add(cubes[i])
+  }
+
+  group.position.set(0,3,0)
+ 
+  scene.add(group)
+}
+
+// 添加一个正方形对象
 const addCube = ()=>{
   const geometry:BoxGeometry = new BoxGeometry( 1, 1, 1 );
   const material:MeshBasicMaterial = new MeshBasicMaterial( { color: '#ff0000' } );
   cube = new Mesh( geometry, material );
   
-  // Position
+  // 1. Position
   // 方法1：分开设置
   // cube.position.x = 0.7
   // cube.position.y = -0.6
   // cube.position.z = 5
   // 方法2：合并设置
-  // cube.position.set(0.7,-0.6,1) 
+  cube.position.set(4.7,-0.6,1) 
 
-  // Scale
+  // 2. Scale
   // cube.scale.x = 2;
   cube.scale.set(2,0.5,0.5)
 
-  // Rotation: rotation & quaternion
-  cube.rotation.y = Math.PI * 0.5; // 旋转半圈 == Math.PI / 2
-  // cube.rotation.set(0,0,0) 
-
-
+  // 3. Rotation: rotation & quaternion。***gimbal lock 注意***
+  // cube.rotation.reorder('YXZ')
+  cube.rotation.x = Math.PI * 0.25;
+  cube.rotation.y = Math.PI * 0.25; // 旋转半圈 == Math.PI / 2
+  // cube.rotation.set(0,0,0)   
   scene.add( cube ); 
 }
 
@@ -57,27 +77,29 @@ onMounted(()=>{
     }); 
     renderer.setSize( window.innerWidth, window.innerHeight ); 
 
-    addCube()
-    addAxesHelper();
-    camera.position.z = 3;
-    camera.position.y = 1;
-    camera.position.x = 1;
-      
-    console.log(cube.position.distanceTo(camera.position)) // 计算对象和摄像头的距离
-    cube.position.normalize() // 使之变成1
-    console.log(cube.position.length())
+    // addCube()
+    addGroup()
+    addAxesHelper(); 
+    camera.position.set(1,0.2,6)
+    // console.log(cube.position.distanceTo(camera.position)) // 计算对象和摄像头的距离
+    // cube.position.normalize() // 使之变成1
+    // console.log(camera.position.length())
+    // camera.lookAt(cube.position)
+    let x = 1;
 
     //创建渲染函数
-    const render = () => {
+    const tick = () => {
       //内置 定时器
-      requestAnimationFrame(render)
+      requestAnimationFrame(tick)
       // cube.rotation.x += 0.01;
       // cube.rotation.y += 0.01;
+      // group.rotation.x += Math.sin(x++)
+      group.rotation.x += 0.01;
 
       //将场景和相机添加到渲染器中执行 一般60次/s
       renderer.render(scene, camera)
     }
-    render()
+    tick()
   }
 })
 
