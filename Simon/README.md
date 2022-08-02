@@ -39,5 +39,6 @@ PointerLockControl 跟随鼠标，鼠标不见了
 OrbitControl 轨道控制器一直会看向某物体 Cool
 TrackballControl 可以旋转视角，悬浮在空中的物体会很立体
 
-
+##### Resize
+window.devicePixelRatio 设备像素比
 

@@ -38,6 +38,8 @@ window.addEventListener('resize',()=>{
   camera.updateProjectionMatrix()
   // 3. Update renderer
   renderer.setSize(W,H)
+  // 当人们拖动窗口去另一个窗口，不需要过高
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2))  
 })
 
 
