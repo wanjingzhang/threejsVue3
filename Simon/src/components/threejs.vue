@@ -12,7 +12,7 @@ import gsap from 'gsap'
 
 // 全局对象 
 interface type{width:number,height:number}
-const sizes:type = {width:800,height:600};
+let sizes:type = {width:window.innerWidth,height:window.innerHeight};
 
 const aspectRatio = sizes.width / sizes.height;
 const scene:Scene = new Scene();
@@ -27,9 +27,21 @@ const axesHelper:AxesHelper = new AxesHelper(3);
 const cubes:Array<Mesh> = new Array<Mesh>(3);
 
 
-/**
- * Cursor
- */
+// 窗口大小需要3步
+window.addEventListener('resize',()=>{
+  console.log('resized');
+  const W = window.innerWidth,H = window.innerHeight;
+  // 1. 
+  sizes = {width:W,height:H}
+  // 2. Update camera
+  camera.aspect = W/H
+  camera.updateProjectionMatrix()
+  // 3. Update renderer
+  renderer.setSize(W,H)
+})
+
+
+// 鼠标控制器
 interface cursorTp{x:number,y:number}
 const cursor:cursorTp = {x:0,y:0}
 document.addEventListener('mousemove',(e)=>{
@@ -44,7 +56,8 @@ const addControls = ()=>{
   // controls.target.y = 1  
   // 2. 重量，阻尼
   controls.enableDamping = true
-
+  // 3. 禁用
+  // controls.enabled = false 
 }
 
 
