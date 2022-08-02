@@ -27,6 +27,33 @@ const axesHelper:AxesHelper = new AxesHelper(3);
 const cubes:Array<Mesh> = new Array<Mesh>(3);
 
 
+// 双击全屏
+window.addEventListener('dblclick',()=>{ 
+  // document.fullScreenElement //W3C  
+  // document.msFullscreenElement //IE 
+  // document.mozFullScreenElement //火狐  
+  // document.webkitFullscreenElement //谷歌  
+  // document.exitFullscreen(); 
+  // document.msExitFullscreen(); 
+  // document.mozCancelFullScreen(); 
+  // document.webkitCancelFullScreen(); 
+
+  const fullscreenElement = document['fullscreenElement'] || document['webkitFullscreenElement'] || document['msFullscreenElement'] || document['mozFullScreenElement'];
+  if(!fullscreenElement){
+    if(dom.requestFullscreen){ // chrome
+      dom.requestFullscreen()
+    }else if(dom['webkitRequestFullscreen']){ // safari
+      dom['webkitRequestFullscreen']()
+    } 
+  }else{
+    if(document.exitFullscreen){ // chrome
+      document.exitFullscreen()
+    }else if(document['webkitExitFullscreen']){ // safari
+      document['webkitExitFullscreen']()
+    } 
+  }
+}) 
+
 // 窗口大小需要3步
 window.addEventListener('resize',()=>{
   console.log('resized');
@@ -40,8 +67,7 @@ window.addEventListener('resize',()=>{
   renderer.setSize(W,H)
   // 当人们拖动窗口去另一个窗口，不需要过高
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2))  
-})
-
+}) 
 
 // 鼠标控制器
 interface cursorTp{x:number,y:number}
